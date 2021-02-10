@@ -37,7 +37,7 @@ def random_generator():
     return rand_list_of_tuples
 
 
-# insert the previously generated random numbers into a given database
+# insert generated random numbers into a given database
 def insert_random_numbers(db="random_numbers_db"):
     try:
         with connect(
