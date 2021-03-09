@@ -5,6 +5,26 @@ from getpass import getpass
 from datetime import datetime
 
 
+class DatabaseManager:
+    def __init__(self):
+        try:
+            self.connection = connect(
+                host="localhost",
+                user=input("Enter username: "),
+                password=getpass("Enter password: "),
+            )
+        except Error as e:
+            print(e)
+
+    def create_database(self, db_name):
+        cursor = self.connection.cursor()
+        cursor.execute("CREATE DATABASE IF NOT EXISTS " + db_name)
+
+
+db = DatabaseManager()
+db.create_database("random_numbers_db")
+
+
 # create the empty database
 def create_database():
     try:
@@ -25,7 +45,7 @@ def random_generator():
     rand_list_to_convert = []  # we use this to convert the random number to tuple (int -> list -> tuple)
     rand_list_of_tuples = []  # list of tuples is the accepted format
     for num in range(0, 100):
-        rand = math.floor(random.random()*10000)
+        rand = math.floor(random.random() * 10000)
         rand_list_to_convert.append(rand)
         now = datetime.now()
         formatted_date = now.strftime('%Y-%m-%d %H:%M:%S')
@@ -41,10 +61,10 @@ def random_generator():
 def insert_random_numbers(db="random_numbers_db"):
     try:
         with connect(
-            host="localhost",
-            user=input("Enter username: "),
-            password=getpass("Enter password: "),
-            database=db,
+                host="localhost",
+                user=input("Enter username: "),
+                password=getpass("Enter password: "),
+                database=db,
         ) as connection:
             insert_query = """
             INSERT INTO random_numbers (rand_num, date) VALUES (%s, %s)
@@ -64,20 +84,21 @@ def calculate_mean(last_elements=3):
     summary = 0
     try:
         with connect(
-            host="localhost",
-            user=input("Enter username: "),
-            password=getpass("Enter password: "),
-            database="random_numbers_db",
+                host="localhost",
+                user=input("Enter username: "),
+                password=getpass("Enter password: "),
+                database="random_numbers_db",
         ) as connection:
             insert_query = """
-            SELECT rand_num FROM (SELECT id, rand_num FROM random_numbers ORDER BY id DESC LIMIT """ + str(last_elements) + """) query ORDER BY id ASC"""
+            SELECT rand_num FROM (SELECT id, rand_num FROM random_numbers ORDER BY id DESC LIMIT """ + str(
+                last_elements) + """) query ORDER BY id ASC"""
             with connection.cursor() as cursor:
                 cursor.execute(insert_query)
                 for row in cursor.fetchall():
                     row = int(row[0])
                     summary += row
                     print(row)
-                print(summary/last_elements) # the mean of the last x elements
+                print(summary / last_elements)  # the mean of the last x elements
     except Error as e:
         print(e)
 
@@ -86,13 +107,14 @@ def calculate_mean(last_elements=3):
 def calculate_avg(last_elements=3):
     try:
         with connect(
-            host="localhost",
-            user=input("Enter username: "),
-            password=getpass("Enter password: "),
-            database="random_numbers_db",
+                host="localhost",
+                user=input("Enter username: "),
+                password=getpass("Enter password: "),
+                database="random_numbers_db",
         ) as connection:
             insert_query = """
-            SELECT AVG(rand_num) AS average FROM (SELECT id, rand_num FROM random_numbers ORDER BY id DESC LIMIT """ + str(last_elements) + """) AS query"""
+            SELECT AVG(rand_num) AS average FROM (SELECT id, rand_num FROM random_numbers ORDER BY id DESC LIMIT """ + str(
+                last_elements) + """) AS query"""
             with connection.cursor() as cursor:
                 cursor.execute(insert_query)
                 for row in cursor.fetchall():
@@ -101,12 +123,10 @@ def calculate_avg(last_elements=3):
     except Error as e:
         print(e)
 
-
 # create_database()
 # insert_random_numbers()
-calculate_mean()
-calculate_avg()
-
+# calculate_mean()
+# calculate_avg()
 
 # useful queries:
 # DELETE FROM random_numbers WHERE id <= 310;
